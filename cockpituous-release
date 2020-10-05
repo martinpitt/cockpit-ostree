@@ -7,6 +7,8 @@
 #
 # Check cockpituous documentation for available release targets.
 
+export RELEASE_VERBOSE=1
+
 RELEASE_SOURCE="_release/source"
 RELEASE_SPEC="cockpit-ostree.spec"
 RELEASE_SRPM="_release/srpm"
@@ -19,11 +21,12 @@ job release-source
 job release-srpm -V
 
 # Do fedora builds for the tag, using tarball
-job release-koji -k master
+#job release-koji -k master
 job release-koji f32
-job release-koji f33
-job release-bodhi F32
-job release-bodhi F33
+#job release-koji f33
+#job release-bodhi F32
+#job release-bodhi F33
+#job release-bodhi F21
 
 job release-github
 job release-copr @cockpit/cockpit-preview
