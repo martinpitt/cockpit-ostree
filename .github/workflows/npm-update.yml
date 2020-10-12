@@ -1,0 +1,37 @@
+name: npm-update
+on:
+  # weekly automatic update on early Tuesday morning (before release day)
+  schedule:
+    - cron: '50 2 * * 2'
+  # can be run manually on https://github.com/cockpit-project/cockpit-ostree/actions
+  workflow_dispatch:
+jobs:
+  npm-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up dependencies
+        run: sudo apt-get install -y npm make
+
+      - name: Set up configuration and secrets
+        run: |
+          echo '${{ secrets.GITHUB_TOKEN }}' > ~/.config/github-token
+
+      - name: Clone repository
+        uses: actions/checkout@v2
+
+      - name: Run bot
+        run: |
+          make bots
+          bots/npm-update --verbose --dry
+          echo -n 'MODULE=' >> $GITHUB_ENV
+          git diff package.json | sed -n '/^+ / { s/^[^"]*"//; s/".*$//; p; q }' >> $GITHUB_ENV
+
+      # this silently skips creating the PR if there are no changes, and updates an existing PR
+      - name: Create/update Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          commit-message: "package.json: Update ${{ env.MODULE }} package dependency"
+          title: "[bot] package.json: Update ${{ env.MODULE }} package dependency"
+          branch: bots/npm-update
+          delete-branch: true
+          labels: bot
