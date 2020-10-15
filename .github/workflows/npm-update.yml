@@ -22,5 +22,6 @@ jobs:
 
       - name: Run npm-update bot
         run: |
-          make bots
+          #make bots
+          git clone -b restricted-token https://github.com/martinpitt/bots
           bots/npm-update --verbose
