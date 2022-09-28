@@ -1,6 +1,6 @@
-upstream_project_url: https://github.com/cockpit-project/cockpit-ostree
+upstream_project_url: https://github.com/martinpitt/cockpit-ostree
 # enable notification of failed downstream jobs as issues
-issue_repository: https://github.com/cockpit-project/cockpit-ostree
+issue_repository: https://github.com/martinpitt/cockpit-ostree
 specfile_path: cockpit-ostree.spec
 upstream_package_name: cockpit-ostree
 downstream_package_name: cockpit-ostree
@@ -25,37 +25,13 @@ jobs:
   - job: copr_build
     trigger: release
     metadata:
-      owner: "@cockpit"
-      project: "cockpit-preview"
+      owner: "martinpitt"
+      project: "test-fixes"
       preserve_project: True
     actions:
       post-upstream-clone: make cockpit-ostree.spec
       # HACK: tarball for releases (copr_build, koji, etc.), copying spec's Source0; this
       # really should be the default, see https://github.com/packit/packit-service/issues/1505
       create-archive:
-        - sh -exc "curl -L -O https://github.com/cockpit-project/cockpit-ostree/releases/download/${PACKIT_PROJECT_VERSION}/${PACKIT_PROJECT_NAME_VERSION}.tar.xz"
+        - sh -exc "curl -L -O https://github.com/martinpitt/cockpit-ostree/releases/download/${PACKIT_PROJECT_VERSION}/${PACKIT_PROJECT_NAME_VERSION}.tar.xz"
         - sh -exc "ls ${PACKIT_PROJECT_NAME_VERSION}.tar.xz"
-
-  - job: propose_downstream
-    trigger: release
-    metadata:
-      dist_git_branches:
-        - fedora-development
-        - fedora-36
-        - fedora-37
-
-  - job: koji_build
-    trigger: commit
-    metadata:
-      dist_git_branches:
-        - fedora-development
-        - fedora-36
-        - fedora-37
-
-  - job: bodhi_update
-    trigger: commit
-    metadata:
-      dist_git_branches:
-        # rawhide updates are created automatically
-        - fedora-36
-        - fedora-37
