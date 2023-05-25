@@ -487,6 +487,16 @@ class OstreeRestartCase(testlib.MachineCase):
         wait_deployment_details_prop(b, 2, "Packages", ".same-packages",
                                      "This deployment contains the same packages as your currently booted system")
 
+        # generate an update
+        generate_new_commit(m, m.execute("rpm -q socat").strip())
+        m.execute("rpm-ostree compose container-encapsulate "
+                  "--repo=/var/local-repo "
+                  "--label ostree.bootable=true "
+                  "--label ostree.commit.version=cockpit-base.2 "
+                  f"{branch} registry:localhost:5000/ostree-oci", timeout=300)
+
+        testlib.sit()
+
     def testDeploymentManagement(self):
         m = self.machine
         b = self.browser
